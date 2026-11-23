@@ -1,0 +1,246 @@
+/* ============================================================
+   Style C · Mono — terminal grid, monospace, acid accents.
+   ============================================================ */
+
+html[data-style="mono"] {
+  --bg: #090b0e;
+  --bg-soft: #0d1116;
+  --surface: rgba(182, 243, 107, 0.035);
+  --surface-2: rgba(255, 255, 255, 0.055);
+  --fg: #d8e2ea;
+  --fg-2: #aab8c4;
+  --muted: #6f7f8c;
+  --border: #1e262e;
+  --border-strong: #33414d;
+  --accent: #b6f36b;
+  --accent-2: #ffb86b;
+  --accent-soft: rgba(182, 243, 107, 0.08);
+  --code-bg: #0b0f13;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --radius: 0px;
+  --radius-sm: 0px;
+  --font-body: "JetBrains Mono", "Cascadia Code", "SFMono-Regular", Consolas,
+    "PingFang SC", "Microsoft YaHei", monospace;
+  --font-display: var(--font-body);
+  --header-bg: rgba(9, 11, 14, 0.94);
+  --header-border: #1e262e;
+  --selection: rgba(182, 243, 107, 0.24);
+  --content-width: 760px;
+}
+
+html[data-style="mono"][data-mode="light"] {
+  --bg: #eef1f3;
+  --bg-soft: #f8fafb;
+  --surface: rgba(15, 23, 30, 0.03);
+  --surface-2: rgba(15, 23, 30, 0.06);
+  --fg: #0c1115;
+  --fg-2: #2b373f;
+  --muted: #61707a;
+  --border: #c9d3da;
+  --border-strong: #9fadb7;
+  --accent: #3f6f00;
+  --accent-2: #a35400;
+  --accent-soft: rgba(63, 111, 0, 0.08);
+  --code-bg: #e7ebee;
+  --shadow: 0 16px 40px rgba(15, 23, 30, 0.1);
+  --header-bg: rgba(238, 241, 243, 0.94);
+  --header-border: #c9d3da;
+  --selection: rgba(63, 111, 0, 0.2);
+}
+
+html[data-style="mono"] body {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center top;
+  font-size: 15px;
+}
+
+html[data-style="mono"][data-mode="light"] body {
+  background-image:
+    linear-gradient(rgba(12, 17, 21, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(12, 17, 21, 0.045) 1px, transparent 1px);
+}
+
+html[data-style="mono"] .site-header {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-style="mono"] .brand-mark {
+  border-radius: 0;
+  background: var(--accent);
+  color: #07100a;
+  box-shadow: none;
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+html[data-style="mono"] .brand-name {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 14px;
+}
+
+html[data-style="mono"] .brand-name::before {
+  content: "~/";
+  color: var(--accent);
+  margin-right: 2px;
+}
+
+html[data-style="mono"] .nav-link {
+  border-radius: 0;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+html[data-style="mono"] .nav-link::before {
+  content: "";
+}
+
+html[data-style="mono"] .nav-link.is-active {
+  background: transparent;
+  color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+html[data-style="mono"] .nav-link.is-active::before {
+  content: "> ";
+}
+
+html[data-style="mono"] .style-switch {
+  border-radius: 0;
+}
+
+html[data-style="mono"] .style-switch button {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+html[data-style="mono"] .style-switch button.is-active {
+  background: var(--accent);
+  color: #07100a;
+}
+
+html[data-style="mono"] .btn {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+}
+
+html[data-style="mono"] .btn--primary {
+  background: var(--accent);
+  color: #07100a;
+  box-shadow: none;
+}
+
+html[data-style="mono"] .btn--primary::before {
+  content: "$ ";
+}
+
+html[data-style="mono"] .btn--primary:hover {
+  background: #c9ff86;
+  box-shadow: 0 0 0 1px var(--accent), 0 0 24px rgba(182, 243, 107, 0.25);
+}
+
+html[data-style="mono"] .btn--ghost {
+  background: transparent;
+  border-color: var(--border-strong);
+}
+
+html[data-style="mono"] .chip {
+  border-radius: 0;
+  background: transparent;
+  border-color: var(--border-strong);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+html[data-style="mono"] .section-kicker {
+  color: var(--accent);
+}
+
+html[data-style="mono"] .section-kicker::before {
+  content: "// ";
+}
+
+html[data-style="mono"] .section-title {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: clamp(19px, 2.6vw, 26px);
+}
+
+html[data-style="mono"] .page-head h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+html[data-style="mono"] .prose h2::before {
+  content: "## ";
+  color: var(--accent);
+}
+
+html[data-style="mono"] .prose h3::before {
+  content: "### ";
+  color: var(--muted);
+}
+
+html[data-style="mono"] .prose .header-anchor {
+  display: none;
+}
+
+html[data-style="mono"] .prose blockquote {
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  background: var(--surface);
+}
+
+html[data-style="mono"] .prose code {
+  border-radius: 0;
+  color: var(--accent);
+}
+
+html[data-style="mono"] .prose .custom-block {
+  border-radius: 0;
+}
+
+html[data-style="mono"] .search-panel,
+html[data-style="mono"] .search-item,
+html[data-style="mono"] .search-input-row kbd {
+  border-radius: 0;
+}
+
+html[data-style="mono"] .post-nav a {
+  border-radius: 0;
+}
+
+html[data-style="mono"] .post-nav a::before {
+  content: "[";
+  color: var(--accent);
+  margin-right: 4px;
+}
+
+html[data-style="mono"] .post-nav a::after {
+  content: "]";
+  color: var(--accent);
+  margin-left: 4px;
+}
+
+html[data-style="mono"] .footer-col h4::before {
+  content: "# ";
+  color: var(--accent);
+}
+
+html[data-style="mono"] .post-cover {
+  border-radius: 0;
+  border-color: var(--border-strong);
+}
+
+html[data-style="mono"] .site-footer {
+  border-top: 1px solid var(--border-strong);
+}

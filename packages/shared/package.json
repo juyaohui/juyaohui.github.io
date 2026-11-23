@@ -1,0 +1,11 @@
+{
+  "name": "@blog/shared",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sync protocol shared by the site and the LAN relay.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts"
+}

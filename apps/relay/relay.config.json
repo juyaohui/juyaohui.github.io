@@ -1,0 +1,11 @@
+{
+  "name": "Jade 的电脑",
+  "port": 5178,
+  "siteUrl": "https://juyaohui.github.io/",
+  "git": {
+    "enabled": true,
+    "remote": "origin",
+    "branch": "master",
+    "push": true
+  }
+}
