@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { withBase } from "vitepress";
 import { nav, profile } from "../../site";
 
 const year = new Date().getFullYear();
@@ -19,14 +20,14 @@ const buildYear = computed(() => (year > profile.since ? `${profile.since}–${y
 
       <div class="footer-col">
         <h4>导航</h4>
-        <a v-for="item in nav" :key="item.link" :href="item.link">{{ item.text }}</a>
+        <a v-for="item in nav" :key="item.link" :href="withBase(item.link)">{{ item.text }}</a>
       </div>
 
       <div class="footer-col">
         <h4>连接</h4>
         <a :href="profile.github" target="_blank" rel="noreferrer">GitHub ↗</a>
-        <a href="/styles/">三种样式</a>
-        <a href="/sync/">手机同步</a>
+        <a :href="withBase('/styles/')">三种样式</a>
+        <a :href="withBase('/sync/')">手机同步</a>
         <span>RSS 即将上线</span>
       </div>
     </div>

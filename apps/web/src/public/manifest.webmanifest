@@ -2,8 +2,8 @@
   "name": "Jade · 手机同步",
   "short_name": "Jade Sync",
   "description": "把手机上的笔记一键同步到电脑并发布。",
-  "start_url": "/sync/",
-  "scope": "/",
+  "start_url": "./sync/",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#06090f",
@@ -11,13 +11,13 @@
   "lang": "zh-CN",
   "icons": [
     {
-      "src": "/images/icon-192.png",
+      "src": "./images/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/images/icon-512.png",
+      "src": "./images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

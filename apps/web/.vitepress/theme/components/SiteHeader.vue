@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { useData, useRoute } from "vitepress";
+import { useData, useRoute, withBase } from "vitepress";
 import { nav, profile, styles } from "../../site";
 import { useStyle } from "../composables/useStyle";
 import { menuOpen, openSearch, toggleMenu } from "../composables/useUi";
@@ -30,7 +30,7 @@ const github = profile.github;
 <template>
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="/" aria-label="返回首页">
+      <a class="brand" :href="withBase('/')" aria-label="返回首页">
         <span class="brand-mark">J</span>
         <span class="brand-name">{{ site.title || profile.name }}</span>
       </a>
@@ -41,7 +41,7 @@ const github = profile.github;
           :key="item.link"
           class="nav-link"
           :class="{ 'is-active': isActive(item.link) }"
-          :href="item.link"
+          :href="withBase(item.link)"
         >
           {{ item.text }}
         </a>
@@ -97,7 +97,7 @@ const github = profile.github;
     <a
       v-for="item in nav"
       :key="item.link"
-      :href="item.link"
+      :href="withBase(item.link)"
       :class="{ 'is-active': isActive(item.link) }"
     >
       {{ item.text }}
