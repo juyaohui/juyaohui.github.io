@@ -10,12 +10,19 @@ const style = ref<StyleId>(defaultStyle);
 const mode = ref<Mode>(defaultMode);
 let initialized = false;
 
+/** The /styles/ page embeds the site in iframes; those must never touch the
+ * shared localStorage preference of the parent page. */
+function isEmbedded(): boolean {
+  return typeof window !== "undefined" && window.self !== window.top;
+}
+
 function apply() {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   root.dataset.style = style.value;
   root.dataset.mode = mode.value;
   root.style.colorScheme = mode.value;
+  if (isEmbedded()) return;
   try {
     localStorage.setItem("blog.style", style.value);
     localStorage.setItem("blog.mode", mode.value);
@@ -32,11 +39,13 @@ function initFromEnvironment() {
   const queryMode = params.get("mode");
   let storedStyle: string | null = null;
   let storedMode: string | null = null;
-  try {
-    storedStyle = localStorage.getItem("blog.style");
-    storedMode = localStorage.getItem("blog.mode");
-  } catch {
-    /* ignore */
+  if (!isEmbedded()) {
+    try {
+      storedStyle = localStorage.getItem("blog.style");
+      storedMode = localStorage.getItem("blog.mode");
+    } catch {
+      /* ignore */
+    }
   }
   const nextStyle = isStyle(queryStyle)
     ? queryStyle
