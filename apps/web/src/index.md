@@ -1,7 +1,6 @@
 ---
 layout: home
-title: 首页
-titleTemplate: false
+title: 个人主页
 sidebar: false
 aside: false
 ---

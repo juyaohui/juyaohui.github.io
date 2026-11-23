@@ -31,6 +31,8 @@ const PUBLIC_DIR = path.join(WEB, "public");
 const args = process.argv.slice(2);
 const srcArgIndex = args.indexOf("--src");
 const SRC = path.resolve(srcArgIndex >= 0 ? args[srcArgIndex + 1] : "G:\\blog0614");
+/** Wipe target trees first. Without it, existing files (including synced notes) are kept. */
+const FORCE = args.includes("--force");
 
 const ASSET_FOLDERS = ["bggroup", "essaypic", "gamepic", "pictures", "toppic"];
 const ASSET_PREFIXES = [...ASSET_FOLDERS.map((f) => `/${f}/`), "/js/", "/bgm/"];
@@ -236,7 +238,7 @@ function copyAssets() {
 function migratePosts() {
   const postsSrc = path.join(SRC, "blogs");
   const postsDest = path.join(SRC_DIR, "posts");
-  fs.rmSync(postsDest, { recursive: true, force: true });
+  if (FORCE) fs.rmSync(postsDest, { recursive: true, force: true });
   ensureDir(postsDest);
 
   const files = walk(postsSrc).filter((f) => f.endsWith(".md"));
@@ -275,6 +277,10 @@ function migratePosts() {
     outName = outName.replace(/\.+/g, ".");
     const outRel = path.join(category, ...parts.slice(1, -1), outName);
     const dest = path.join(postsDest, outRel);
+    if (!FORCE && fs.existsSync(dest)) {
+      report.skipped.push({ file: rel, reason: "目标已存在（加 --force 覆盖）" });
+      continue;
+    }
     ensureDir(path.dirname(dest));
     fs.writeFileSync(
       dest,
@@ -291,7 +297,7 @@ function migratePosts() {
 function migrateNotes() {
   const notesSrc = path.join(SRC, "notes");
   const notesDest = path.join(SRC_DIR, "notes");
-  fs.rmSync(notesDest, { recursive: true, force: true });
+  if (FORCE) fs.rmSync(notesDest, { recursive: true, force: true });
   ensureDir(notesDest);
 
   for (const file of walk(notesSrc).filter((f) => f.endsWith(".md"))) {
@@ -317,6 +323,10 @@ function migrateNotes() {
     const outName = /^readme\.md$/i.test(fileName) ? "index.md" : fileName;
     const outRel = path.join(...parts.slice(0, -1), outName);
     const dest = path.join(notesDest, outRel);
+    if (!FORCE && fs.existsSync(dest)) {
+      report.skipped.push({ file: `notes/${rel}`, reason: "目标已存在（加 --force 覆盖）" });
+      continue;
+    }
     ensureDir(path.dirname(dest));
     const lines = [
       "---",
