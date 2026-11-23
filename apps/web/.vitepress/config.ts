@@ -11,12 +11,12 @@ const styleBootstrap = `(function(){try{
   var ls=window.localStorage;
   var st=ls.getItem('blog.style');
   var md=ls.getItem('blog.mode');
-  if(ok.indexOf(s)<0){s=ok.indexOf(st)>=0?st:'aurora';}
+  if(ok.indexOf(s)<0){s=ok.indexOf(st)>=0?st:'mono';}
   if(m!=='light'&&m!=='dark'){m=(md==='light'||md==='dark')?md:(s==='paper'?'light':'dark');}
   document.documentElement.dataset.style=s;
   document.documentElement.dataset.mode=m;
   document.documentElement.style.colorScheme=m;
-}catch(e){document.documentElement.dataset.style='aurora';document.documentElement.dataset.mode='dark';}})()`;
+}catch(e){document.documentElement.dataset.style='mono';document.documentElement.dataset.mode='dark';}})()`;
 
 export default defineConfig({
   lang: "zh-CN",

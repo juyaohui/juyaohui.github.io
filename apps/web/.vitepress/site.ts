@@ -49,7 +49,7 @@ export const styles: StyleMeta[] = [
   },
 ];
 
-export const defaultStyle: StyleId = "aurora";
+export const defaultStyle: StyleId = "mono";
 export const defaultMode: Mode = "dark";
 
 export const profile = {
