@@ -40,6 +40,12 @@ const ROOT_ASSETS = ["avatar01.png", "logo.png", "logo_ju.png", "hero.png"];
 
 const CATEGORY_ORDER = ["技术栈", "菜鸡成长日志", "随笔", "其他"];
 
+/** A couple of files had no usable title in the old site. */
+const TITLE_OVERRIDES = new Map([
+  ["技术栈/AI/parameters.md", "AI 训练参数速查"],
+  ["其他/个人资料备份.md", "旧资料备份"],
+]);
+
 const report = {
   posts: [],
   notes: [],
@@ -263,10 +269,11 @@ function migratePosts() {
       continue;
     }
     const fm = parsed.data ?? {};
-    const title =
+    let title =
       (typeof fm.title === "string" && fm.title.trim()) ||
       (raw.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? "") ||
       path.basename(fileName, ".md").replace(/\.+$/, "");
+    title = TITLE_OVERRIDES.get(rel.split(path.sep).join("/")) ?? title;
     const date = sourceDate(file, fm.date);
     const tags = Array.isArray(fm.tags) ? fm.tags.map(String) : [];
     const cover = typeof fm.pic === "string" ? fm.pic : typeof fm.topPic === "string" ? fm.topPic : "";

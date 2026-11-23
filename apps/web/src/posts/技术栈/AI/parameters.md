@@ -1,5 +1,5 @@
 ---
-title: "parameters"
+title: "AI 训练参数速查"
 date: 2026-08-18
 category: "技术栈"
 excerpt: "Checkpoint（检查点）：在训练过程中，特定间隔或特定条件下保存的模型的快照。Checkpoints 可以用于从特定时间点恢复训练或用于模型评估。训练期间的检查点可以包含模型参数和优化器状态等信息。 Top-k（前 k 个）：在生成文本等任务中，top-k 参数用于限制在下…"
