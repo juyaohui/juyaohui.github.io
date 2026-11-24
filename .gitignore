@@ -14,3 +14,10 @@ Thumbs.db
 !.vscode/extensions.json
 screenshots/
 tmp/
+
+# Android app build artifacts (source + published APK under apps/web are tracked)
+android/build/
+android/libs/
+android/signing/
+android/*.apk
+android/*.apk.idsig

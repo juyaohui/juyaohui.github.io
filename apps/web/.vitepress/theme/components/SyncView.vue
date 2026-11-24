@@ -455,6 +455,18 @@ watch([manualServer, manualCode], persist);
           </p>
         </section>
 
+        <section class="card app-card">
+          <span class="eyebrow">ANDROID APP</span>
+          <h2>装一个「随记」App</h2>
+          <p>
+            本地写笔记、离线保存，App 内扫码配对，打开电脑时一键同步。
+            下载 APK 直接安装，数据只存在手机和你的电脑上。
+          </p>
+          <a class="download-btn" :href="withBase('/downloads/suiji-1.0.apk')" download>
+            下载随记 APK · 约 614 KB
+          </a>
+        </section>
+
         <section class="card muted-card">
           <h2>为什么不在公开站点直接同步？</h2>
           <p>
@@ -868,6 +880,27 @@ watch([manualServer, manualCode], persist);
 .muted-card {
   background: transparent;
   border-style: dashed;
+}
+
+.app-card {
+  background: linear-gradient(150deg, rgba(182, 243, 107, 0.1), rgba(125, 211, 252, 0.06)), var(--s-card);
+}
+
+.download-btn {
+  display: block;
+  margin-top: 16px;
+  padding: 13px;
+  border-radius: 12px;
+  background: var(--s-accent-2);
+  color: #07100a;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.download-btn:hover {
+  filter: brightness(1.05);
 }
 
 /* pairing */

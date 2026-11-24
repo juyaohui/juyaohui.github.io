@@ -148,6 +148,25 @@ Jade 的电脑 · 手机同步服务
 
 > **为什么公开站点里不能直接同步？** 浏览器会拦截 `https://` 页面访问局域网 `http://` 接口。同步面板由电脑端服务提供（同源 HTTP），公开主页只负责展示与说明。详见 [docs/SYNC.md](docs/SYNC.md)。
 
+### Android App（随记）
+
+除了手机浏览器，还做了一个 614 KB 的原生 APK：
+
+- 本地记笔记，离线保存，杀进程不丢
+- App 内扫码配对（扫电脑 `/pair` 二维码），也可以手动输入 IP + 配对码
+- 一键同步到电脑，电脑自动 commit/push，Pages 自动更新
+- 同步页有「打开个人主页」按钮，直接跳到 <https://juyaohui.github.io/>
+- 下载：<https://juyaohui.github.io/downloads/suiji-1.0.apk>
+
+源码在 `android/`，说明见 [android/README.md](android/README.md)。重新打包：
+
+```powershell
+cd android
+.\build.ps1
+```
+
+构建会复用 `android-apk/tools` 里的 JDK 17 + Android SDK 34，签名用同一套证书，产物自动复制到 `apps/web/src/public/downloads/`。
+
 ### 4. 配置
 
 `apps/relay/relay.config.json`：

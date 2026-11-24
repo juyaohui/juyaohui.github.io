@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">随记</string>
+    <string name="subtitle">记在手机上，回电脑一键同步</string>
+</resources>
