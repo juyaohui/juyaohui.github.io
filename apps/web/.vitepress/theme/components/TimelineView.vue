@@ -2,28 +2,56 @@
 import { computed } from "vue";
 import { withBase } from "vitepress";
 import { data as postsData } from "../../data/posts.data";
+import { data as notesData } from "../../data/notes.data";
+
+interface TimelineEntry {
+  url: string;
+  title: string;
+  date: string;
+  type: "文章" | "笔记";
+  kind: string;
+}
 
 const posts = postsData;
 
+const entries = computed<TimelineEntry[]>(() => {
+  const list: TimelineEntry[] = [
+    ...posts.map((post) => ({
+      url: post.url,
+      title: post.title,
+      date: post.date,
+      type: "文章" as const,
+      kind: post.category,
+    })),
+    ...notesData.map((note) => ({
+      url: note.url,
+      title: note.title,
+      date: note.date,
+      type: "笔记" as const,
+      kind: note.group,
+    })),
+  ].filter((entry) => /^\d{4}-\d{2}-\d{2}$/.test(entry.date));
+  return list.sort((a, b) => b.date.localeCompare(a.date));
+});
+
 const groups = computed(() => {
-  const map = new Map<string, typeof posts>();
-  for (const post of posts) {
-    const list = map.get(post.year) ?? [];
-    list.push(post);
-    map.set(post.year, list);
+  const map = new Map<string, TimelineEntry[]>();
+  for (const entry of entries.value) {
+    const year = entry.date.slice(0, 4);
+    const list = map.get(year) ?? [];
+    list.push(entry);
+    map.set(year, list);
   }
   return [...map.entries()].map(([year, items]) => ({ year, items }));
 });
-
-const pad = (index: number) => String(index + 1).padStart(2, "0");
 </script>
 
 <template>
   <div class="timeline page">
     <header class="page-head">
-      <span class="section-kicker">Timeline · {{ posts.length }} entries</span>
+      <span class="section-kicker">Timeline · {{ entries.length }} documents</span>
       <h1>时间线</h1>
-      <p>所有文章按时间铺开，像一条不紧不慢的河。</p>
+      <p>所有文章与笔记都放在这里，按时间铺开，像一条不紧不慢的河。</p>
     </header>
 
     <div class="timeline-list">
@@ -34,11 +62,18 @@ const pad = (index: number) => String(index + 1).padStart(2, "0");
         </header>
 
         <div class="year-body">
-          <a v-for="post in group.items" :key="post.url" class="tl-item" :href="withBase(post.url)">
+          <a
+            v-for="entry in group.items"
+            :key="entry.type + entry.url"
+            class="tl-item"
+            :class="{ 'is-note': entry.type === '笔记' }"
+            :href="withBase(entry.url)"
+          >
             <span class="dot" />
-            <span class="date">{{ post.date.slice(5) }}</span>
-            <span class="title">{{ post.title }}</span>
-            <span class="cat">{{ post.category }}</span>
+            <span class="date">{{ entry.date.slice(5) }}</span>
+            <span class="title">{{ entry.title }}</span>
+            <span class="type">{{ entry.type }}</span>
+            <span class="cat">{{ entry.kind }}</span>
           </a>
         </div>
       </section>
@@ -93,7 +128,7 @@ const pad = (index: number) => String(index + 1).padStart(2, "0");
 .tl-item {
   position: relative;
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr) 110px;
+  grid-template-columns: 54px minmax(0, 1fr) 44px 110px;
   gap: 14px;
   align-items: baseline;
   padding: 13px 0 13px 18px;
@@ -136,6 +171,28 @@ const pad = (index: number) => String(index + 1).padStart(2, "0");
   transition: color 0.2s var(--ease);
 }
 
+.type {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 6px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tl-item.is-note .type {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.tl-item.is-note .dot {
+  background: var(--accent);
+  opacity: 0.55;
+}
+
 .cat {
   font-size: 11px;
   color: var(--muted);
@@ -157,7 +214,7 @@ const pad = (index: number) => String(index + 1).padStart(2, "0");
     font-size: 30px;
   }
   .tl-item {
-    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-columns: 48px minmax(0, 1fr) 40px;
   }
   .cat {
     display: none;

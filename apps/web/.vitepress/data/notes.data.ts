@@ -11,6 +11,7 @@ const groups: Record<string, string> = {
   "": "开始",
   git: "Git",
   vue: "VuePress",
+  移动端: "移动端",
 };
 
 function groupOf(url: string): string {

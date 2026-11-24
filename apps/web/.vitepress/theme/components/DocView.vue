@@ -32,7 +32,7 @@ const older = computed(() =>
   index.value >= 0 && index.value < postsData.length - 1 ? postsData[index.value + 1] : undefined,
 );
 
-const groupOrder = ["开始", "Git", "VuePress", "参考"];
+const groupOrder = ["开始", "移动端", "Git", "VuePress", "参考"];
 const groups = computed(() => {
   const map = new Map<string, typeof notesData>();
   for (const note of notesData) {
