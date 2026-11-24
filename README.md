@@ -74,6 +74,17 @@ pnpm test         # Relay 单元测试
 
 > 如果系统里同时装了旧版 Node，请确保 `node -v` 是 20 以上再运行。
 
+### Windows 快速启动（没装 pnpm 也能用）
+
+如果系统 Node 还是 16、也没装 pnpm，可以直接双击项目根目录的 `sync.cmd`，它会自动寻找可用的 Node 20+ 运行时并启动同步服务。也可以在 PowerShell 里：
+
+```powershell
+cd G:\demoshowcase\blog
+.\sync.cmd
+```
+
+`sync.cmd` 只负责启动手机同步服务；装好 Node 20+ / pnpm 之后，`pnpm dev`、`pnpm build` 等命令照常使用。
+
 ## 写内容
 
 文章放在 `apps/web/src/posts/<分类>/<文件名>.md`，frontmatter 示例：
