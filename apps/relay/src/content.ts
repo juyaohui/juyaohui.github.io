@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { SYNC_TARGETS, slugify, type SyncFileStatus, type SyncItem } from "@blog/shared";
+import { LIMITS, SYNC_TARGETS, slugify, type SyncFileStatus, type SyncItem } from "@blog/shared";
 import type { NoteRecord } from "./store";
 
 export interface WriteOutcome {
@@ -11,6 +11,52 @@ export interface WriteOutcome {
   status: SyncFileStatus;
   message?: string;
   record: NoteRecord;
+}
+
+const IMAGE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,80}\.(jpg|jpeg|png|webp)$/i;
+
+/**
+ * Write images referenced by a note into apps/web/src/public/images/mobile.
+ * Names come from the client but are validated; the note body already contains
+ * the matching /images/mobile/<name> URL.
+ */
+export function writeImages(options: {
+  contentRoot: string;
+  repoRoot: string;
+  item: SyncItem;
+}): { files: string[] } {
+  const { contentRoot, repoRoot, item } = options;
+  const images = item.images ?? [];
+  if (!images.length) return { files: [] };
+  if (images.length > LIMITS.maxImagesPerItem) {
+    throw new Error(`一条笔记最多 ${LIMITS.maxImagesPerItem} 张图片`);
+  }
+
+  const root = path.resolve(contentRoot);
+  const dir = path.resolve(contentRoot, "public", "images", "mobile");
+  if (!dir.startsWith(root + path.sep)) throw new Error("图片目录越界");
+  fs.mkdirSync(dir, { recursive: true });
+
+  const files: string[] = [];
+  let total = 0;
+  for (const image of images) {
+    if (!IMAGE_NAME.test(image.name)) throw new Error(`图片文件名不合法: ${image.name}`);
+    const data = image.data.replace(/\s+/g, "");
+    if (!/^[A-Za-z0-9+/=]+$/.test(data)) throw new Error("图片数据不合法");
+    const buffer = Buffer.from(data, "base64");
+    if (!buffer.length) throw new Error("图片内容为空");
+    if (buffer.length > LIMITS.maxImageBytes) {
+      throw new Error(`图片 ${image.name} 超过 ${LIMITS.maxImageBytes / 1_000_000}MB`);
+    }
+    total += buffer.length;
+    if (total > LIMITS.maxTotalImageBytes) throw new Error("图片总量过大");
+
+    const abs = path.join(dir, image.name);
+    if (!abs.startsWith(dir + path.sep)) throw new Error("图片路径越界");
+    fs.writeFileSync(abs, buffer);
+    files.push(path.relative(repoRoot, abs).split(path.sep).join("/"));
+  }
+  return { files };
 }
 
 const hash = (value: string) => crypto.createHash("sha256").update(value).digest("hex");

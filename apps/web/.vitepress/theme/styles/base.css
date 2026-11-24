@@ -486,15 +486,17 @@ a.chip:hover {
 
 .doc-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
+  grid-template-columns: minmax(0, var(--content-width)) 220px;
   gap: 56px;
   align-items: start;
+  justify-content: center;
   width: min(var(--page-width), calc(100% - 48px));
   margin-inline: auto;
 }
 
 .doc-grid.has-sidebar {
   grid-template-columns: 230px minmax(0, 1fr) 210px;
+  justify-content: stretch;
 }
 
 .doc-main {
@@ -789,7 +791,9 @@ a.chip:hover {
 }
 
 @media (max-width: 1080px) {
-  .doc-grid,
+  .doc-grid {
+    grid-template-columns: minmax(0, var(--content-width));
+  }
   .doc-grid.has-sidebar {
     grid-template-columns: 210px minmax(0, 1fr);
     gap: 40px;

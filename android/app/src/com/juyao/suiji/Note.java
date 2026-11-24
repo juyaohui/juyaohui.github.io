@@ -5,8 +5,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Note {
+    private static final Pattern IMAGE_REF = Pattern.compile("/images/mobile/([A-Za-z0-9._-]+)");
+
     public String id = "";
     public String title = "";
     public String content = "";
@@ -49,9 +53,28 @@ public class Note {
 
     public String snippet() {
         if (content == null) return "";
-        String text = content.replace("\r", " ").replace("\n", " ").trim();
+        String text = content
+                .replaceAll("!\\[[^\\]]*\\]\\(/images/mobile/[^)]+\\)", " ")
+                .replace("\r", " ")
+                .replace("\n", " ")
+                .trim();
         if (text.length() <= 80) return text;
         return text.substring(0, 80) + "…";
+    }
+
+    public ArrayList<String> imageNames() {
+        ArrayList<String> out = new ArrayList<>();
+        if (content == null) return out;
+        Matcher matcher = IMAGE_REF.matcher(content);
+        while (matcher.find()) {
+            String name = matcher.group(1);
+            if (!out.contains(name)) out.add(name);
+        }
+        return out;
+    }
+
+    public int imageCount() {
+        return imageNames().size();
     }
 
     public ArrayList<String> tagList() {

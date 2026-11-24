@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
@@ -18,6 +19,9 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -185,6 +189,19 @@ public class MainActivity extends Activity {
         tag.setBackgroundResource(R.drawable.bg_tag);
         tag.setPadding(dp(8), dp(2), dp(8), dp(2));
         meta.addView(tag);
+
+        int imageCount = note.imageCount();
+        if (imageCount > 0) {
+            TextView imageTag = new TextView(this);
+            imageTag.setText("图 " + imageCount);
+            imageTag.setTextColor(getColor(R.color.ink2));
+            imageTag.setTextSize(10);
+            LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            ilp.leftMargin = dp(8);
+            meta.addView(imageTag, ilp);
+        }
 
         View spacer = new View(this);
         meta.addView(spacer, new LinearLayout.LayoutParams(0, 1, 1f));
@@ -446,6 +463,22 @@ public class MainActivity extends Activity {
                 o.put("target", note.target);
                 o.put("createdAt", Iso.format(note.createdAt));
                 o.put("updatedAt", Iso.format(note.updatedAt));
+
+                ArrayList<String> imageNames = note.imageNames();
+                if (!imageNames.isEmpty()) {
+                    JSONArray images = new JSONArray();
+                    for (String name : imageNames) {
+                        File file = new File(new File(getFilesDir(), "images"), name);
+                        if (!file.exists()) continue;
+                        byte[] bytes = readFile(file);
+                        if (bytes.length == 0 || bytes.length > 3_000_000) continue;
+                        JSONObject image = new JSONObject();
+                        image.put("name", name);
+                        image.put("data", Base64.encodeToString(bytes, Base64.NO_WRAP));
+                        images.put(image);
+                    }
+                    if (images.length() > 0) o.put("images", images);
+                }
                 items.put(o);
             }
         } catch (Exception e) {
@@ -535,6 +568,16 @@ public class MainActivity extends Activity {
 
     private int dp(int value) {
         return Math.round(getResources().getDisplayMetrics().density * value);
+    }
+
+    private byte[] readFile(File file) throws Exception {
+        FileInputStream input = new FileInputStream(file);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        byte[] buffer = new byte[8192];
+        int read;
+        while ((read = input.read(buffer)) > 0) output.write(buffer, 0, read);
+        input.close();
+        return output.toByteArray();
     }
 
     private void toast(String text) {

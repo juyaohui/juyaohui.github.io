@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useData, withBase } from "vitepress";
 import { data as postsData } from "../../data/posts.data";
 import { data as notesData } from "../../data/notes.data";
@@ -49,7 +49,36 @@ const groups = computed(() => {
     .map(([name, items]) => ({ name, items }));
 });
 
-const outline = computed(() => (page.value.headers ?? []).filter((item) => item.level >= 2 && item.level <= 3));
+interface OutlineItem {
+  level: number;
+  title: string;
+  slug: string;
+}
+
+const outline = ref<OutlineItem[]>([]);
+
+/** VitePress page.headers is empty in this custom theme; read the rendered headings. */
+function buildOutline() {
+  if (typeof document === "undefined") return;
+  const nodes = Array.from(document.querySelectorAll<HTMLElement>(".prose h2, .prose h3"));
+  outline.value = nodes
+    .map((el) => ({
+      level: el.tagName === "H2" ? 2 : 3,
+      title: (el.textContent ?? "").replace(/\u200b/g, "").replace(/^#+\s*/, "").trim(),
+      slug: el.id,
+    }))
+    .filter((item) => item.slug && item.title);
+}
+
+onMounted(buildOutline);
+
+watch(
+  () => page.value.relativePath,
+  async () => {
+    await nextTick();
+    window.setTimeout(buildOutline, 30);
+  },
+);
 
 const title = computed(
   () => post.value?.title ?? (typeof frontmatter.value.title === "string" ? frontmatter.value.title : "文档"),

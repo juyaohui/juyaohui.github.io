@@ -16,7 +16,7 @@ import {
 } from "@blog/shared";
 import { isPrivateAddress, lanAddresses, readGitToken, type RelayConfig } from "./config";
 import { SyncStore } from "./store";
-import { writeNote } from "./content";
+import { writeImages, writeNote } from "./content";
 import { commitAndPush } from "./git";
 
 export const RELAY_VERSION = "2.0.0";
@@ -37,6 +37,15 @@ const SyncItemSchema = z.object({
   target: z.enum(["essay", "tech", "note"]),
   createdAt: z.string(),
   updatedAt: z.string(),
+  images: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(100),
+        data: z.string().min(1).max(4_500_000),
+      }),
+    )
+    .max(LIMITS.maxImagesPerItem)
+    .optional(),
 });
 
 const SyncBody = z.object({
@@ -61,7 +70,7 @@ export interface RelayServer {
 }
 
 export async function buildServer({ config, store }: BuildServerOptions): Promise<RelayServer> {
-  const app = Fastify({ logger: false, bodyLimit: 8 * 1024 * 1024, trustProxy: false });
+  const app = Fastify({ logger: false, bodyLimit: 40 * 1024 * 1024, trustProxy: false });
   const syncStore = store ?? new SyncStore(config.stateDir, config.pairingTtlMinutes);
   const subscribers = new Set<(event: SyncProgressEvent) => void>();
   const pairAttempts = new Map<string, PairAttempt>();
@@ -205,9 +214,15 @@ export async function buildServer({ config, store }: BuildServerOptions): Promis
       return reply.code(400).send({ error: "同步数据格式不正确", details: parsed.error.issues });
     }
     const { items } = parsed.data;
-    const total = items.reduce((sum, item) => sum + Buffer.byteLength(item.content, "utf8"), 0);
-    if (total > LIMITS.maxTotalBytes) {
-      return reply.code(413).send({ error: "内容过大" });
+    const total = items.reduce(
+      (sum, item) =>
+        sum +
+        Buffer.byteLength(item.content, "utf8") +
+        (item.images ?? []).reduce((imageSum, image) => imageSum + Math.ceil(image.data.length * 0.75), 0),
+      0,
+    );
+    if (total > LIMITS.maxTotalRequestBytes) {
+      return reply.code(413).send({ error: "内容过大（图片或文字超过限制）" });
     }
 
     syncing = true;
@@ -220,6 +235,13 @@ export async function buildServer({ config, store }: BuildServerOptions): Promis
       for (const [index, item] of items.entries()) {
         broadcast("writing", `正在写入 ${index + 1}/${items.length}：${item.title || "无标题"}`);
         try {
+          const imageResult = writeImages({
+            contentRoot: config.contentRoot,
+            repoRoot: config.repoRoot,
+            item,
+          });
+          if (imageResult.files.length) files.push(...imageResult.files);
+
           const outcome = writeNote({
             contentRoot: config.contentRoot,
             repoRoot: config.repoRoot,
@@ -231,7 +253,9 @@ export async function buildServer({ config, store }: BuildServerOptions): Promis
             path: outcome.relPath,
             title: item.title,
             status: outcome.status,
-            message: outcome.message,
+            message: imageResult.files.length
+              ? `${outcome.message ?? ""} +${imageResult.files.length} 张图片`.trim()
+              : outcome.message,
           });
           if (outcome.status === "created" || outcome.status === "updated" || outcome.status === "conflict") {
             files.push(outcome.relPath);

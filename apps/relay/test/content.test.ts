@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { renderNote, writeNote } from "../src/content";
+import { renderNote, writeImages, writeNote } from "../src/content";
 import type { SyncItem } from "@blog/shared";
 
 const item = (overrides: Partial<SyncItem> = {}): SyncItem => ({
@@ -112,5 +112,39 @@ describe("writeNote", () => {
   it("uses a stable filename based on the note date", () => {
     const outcome = writeNote({ contentRoot, repoRoot: root, item: item() });
     expect(path.basename(outcome.absPath)).toMatch(/^2026-11-23-雨天的测试笔记\.md$/);
+  });
+});
+
+describe("writeImages", () => {
+  it("writes images under public/images/mobile", () => {
+    const data = Buffer.from("fake-image-bytes").toString("base64");
+    const result = writeImages({
+      contentRoot,
+      repoRoot: root,
+      item: item({ images: [{ name: "20261124-test.jpg", data }] }),
+    });
+    expect(result.files).toHaveLength(1);
+    expect(result.files[0]).toBe("apps/web/src/public/images/mobile/20261124-test.jpg");
+    expect(fs.existsSync(path.join(contentRoot, "public", "images", "mobile", "20261124-test.jpg"))).toBe(true);
+  });
+
+  it("rejects path traversal in image names", () => {
+    expect(() =>
+      writeImages({
+        contentRoot,
+        repoRoot: root,
+        item: item({ images: [{ name: "../evil.jpg", data: "aGVsbG8=" }] }),
+      }),
+    ).toThrow(/文件名/);
+  });
+
+  it("rejects corrupt base64", () => {
+    expect(() =>
+      writeImages({
+        contentRoot,
+        repoRoot: root,
+        item: item({ images: [{ name: "broken.jpg", data: "not base64 ***" }] }),
+      }),
+    ).toThrow(/数据/);
   });
 });

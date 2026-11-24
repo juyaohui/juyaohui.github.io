@@ -33,6 +33,15 @@ export interface SyncItem {
   target: SyncTarget;
   createdAt: string;
   updatedAt: string;
+  /** Optional images referenced from the Markdown as /images/mobile/<name>. */
+  images?: SyncImage[];
+}
+
+export interface SyncImage {
+  /** File name only, e.g. 20261124-231500-a1b2.jpg */
+  name: string;
+  /** Base64 without the data: prefix. */
+  data: string;
 }
 
 export interface DeviceInfo {
@@ -134,6 +143,13 @@ export const LIMITS = {
   maxItemBytes: 200_000,
   maxTotalBytes: 4_000_000,
   maxTitleChars: 120,
+  maxImagesPerItem: 8,
+  /** Decoded bytes per image. */
+  maxImageBytes: 3_000_000,
+  /** Decoded bytes for all images in one sync request. */
+  maxTotalImageBytes: 20_000_000,
+  /** Whole JSON request body. */
+  maxTotalRequestBytes: 32_000_000,
 } as const;
 
 export function isSyncTarget(value: unknown): value is SyncTarget {

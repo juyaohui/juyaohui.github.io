@@ -85,6 +85,38 @@ describe("relay API", () => {
     expect(fs.readFileSync(written, "utf8")).toContain("你好，世界");
   });
 
+  it("syncs a note with an image", async () => {
+    const { code } = store.pairing;
+    const pair = await app.inject({
+      method: "POST",
+      url: "/api/pair",
+      payload: { code, device: { name: "Pixel", platform: "android" } },
+    });
+    const { token } = pair.json<PairResponse>();
+    const sync = await app.inject({
+      method: "POST",
+      url: "/api/sync",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        deviceId: "x",
+        clientTime: new Date().toISOString(),
+        items: [
+          {
+            ...note("img"),
+            content: "看图\n\n![图片](/images/mobile/pic.png)",
+            images: [{ name: "pic.png", data: Buffer.from("fake-png").toString("base64") }],
+          },
+        ],
+      },
+    });
+    expect(sync.statusCode).toBe(200);
+    const body = sync.json<SyncResponse>();
+    expect(body.files[0]?.status).toBe("created");
+    const imagePath = path.join(config.contentRoot, "public", "images", "mobile", "pic.png");
+    expect(fs.existsSync(imagePath)).toBe(true);
+    expect(fs.readFileSync(imagePath, "utf8")).toBe("fake-png");
+  });
+
   it("requires a token for sync", async () => {
     const response = await app.inject({
       method: "POST",

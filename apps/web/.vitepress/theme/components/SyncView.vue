@@ -463,7 +463,7 @@ watch([manualServer, manualCode], persist);
             下载 APK 直接安装，数据只存在手机和你的电脑上。
           </p>
           <a class="download-btn" :href="withBase('/downloads/suiji-1.0.apk')" download>
-            下载随记 APK · 约 614 KB
+            下载随记 APK · 约 622 KB
           </a>
         </section>
 

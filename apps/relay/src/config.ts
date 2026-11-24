@@ -85,9 +85,13 @@ export function loadConfig(overrides: PartialConfig = {}): RelayConfig {
   };
 
   // Environment switches are handy for one-off runs and CI.
+  if (process.env.RELAY_PORT) merged.port = Number(process.env.RELAY_PORT);
+  if (process.env.RELAY_HOST) merged.host = process.env.RELAY_HOST;
   if (process.env.RELAY_PUSH === "0") merged.git.push = false;
   if (process.env.RELAY_GIT === "0") merged.git.enabled = false;
   if (process.env.RELAY_SITE_URL) merged.siteUrl = process.env.RELAY_SITE_URL;
+  if (process.env.RELAY_STATE_DIR) merged.stateDir = path.resolve(process.env.RELAY_STATE_DIR);
+  if (process.env.RELAY_CONTENT_ROOT) merged.contentRoot = path.resolve(process.env.RELAY_CONTENT_ROOT);
 
   return merged;
 }

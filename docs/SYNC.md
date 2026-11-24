@@ -66,8 +66,11 @@
   target: "essay" | "tech" | "note"   // posts/随笔 | posts/技术栈 | notes/移动端
   createdAt: string
   updatedAt: string
+  images?: Array<{ name: string; data: string }>  // Base64（无 data: 前缀）
 }
 ```
+
+图片写到 `apps/web/src/public/images/mobile/<name>`，正文里用 `/images/mobile/<name>` 引用；单条最多 8 张、单张解码后 ≤3MB、单次图片总量 ≤20MB。
 
 ## 安全设计
 
